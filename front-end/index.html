@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EJS Client-Side Rendering</title>
+    <!-- Include EJS library for client-side rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/ejs@3.1.6/ejs.min.js"></script>
+    <style>@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap'); *{font-family:"Poppins", serif;} </style>
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="cont">
+        <h1>EJS Client-Side Rendering</h1>
+
+
+        <!-- Placeholder where the rendered template will be injected -->
+        <h2>contenido servidor local</h2>
+        <div id="content"></div>
+        <h2>contenido del servidor REMOTO</h2>
+        <div id="contentServer"></div>
+    </div>
+
+
+    <script>
+        // Sample data to render
+        const data = [
+            { name: "Alice", age: 26 },
+            { name: "Bob", age: 30 },
+            { name: "Charlie", age: 35 },
+        ];
+
+
+        // Function to load the external EJS template
+        async function loadTemplate(url) {
+            const response = await fetch(url);
+            const template = await response.text();
+            return template;
+        }
+
+
+        // Load the EJS template from an external file
+        loadTemplate("template.ejs")
+            .then((template) => {
+                // Render the template with the data
+                const renderedHtml = ejs.render(template, { data: data });
+
+
+                // Insert the rendered HTML into the content div
+                document.getElementById("content").innerHTML = renderedHtml;
+            })
+            .catch((error) => {
+                console.error("Error loading template:", error);
+            });
+
+
+        async function loadFromServer() {
+            // Load the EJS template from an external file
+            const template2 = await loadTemplate("template.ejs");
+            console.log(template2);
+            const dataServer = await loadTemplate("http://localhost:3000/data");
+            console.log(dataServer);
+            const renderedHtml2 = ejs.render(template2, {
+                data: JSON.parse(dataServer),
+            });
+            // Insert the rendered HTML into the content div
+            document.getElementById("contentServer").innerHTML = renderedHtml2;
+        }
+
+
+        loadFromServer();
+    </script>
+</body>
+
+</html>
